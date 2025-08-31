@@ -1,125 +1,97 @@
-Library Management System - Backend (ASP.NET Core 9)
+A **Library Management System backend** built with **ASP.NET Core 9** and **Entity Framework Core 8**, implementing **JWT authentication**, **role-based authorization**, and basic CRUD operations. Designed as an **internship project** to demonstrate backend development skills.
 
-A simple Library Management System backend built with ASP.NET Core 9, Entity Framework Core, and JWT authentication. Designed as an internship task to demonstrate role-based authorization, CRUD operations, and basic validations.
+---
 
-Features
-Authentication & Authorization
+## Features
 
-Register/Login for both Librarians and Students.
+### **Authentication & Authorization**
+- Register/Login for both **Librarians** and **Students**
+- Roles:
+  - `librarian`: Full CRUD on books & can view all borrow records
+  - `student`: Borrow, return, and view books
+- JWT tokens for authentication
+- Middleware for role-based authorization
 
-Roles:
+### **Entities**
+- **Users**: Id, Name, Email, PasswordHash, Role, CreatedAt, UpdatedAt
+- **Books**: Id, Title, Author, ISBN, Category, Quantity, CreatedAt, UpdatedAt
+- **BorrowRecords**: Id, UserId, BookId, BorrowDate, ReturnDate, DueDate, Status (`borrowed` / `returned`)
 
-librarian: Full CRUD access on books and can view all borrow records.
+### **Validations & Logic**
+- Email format and password length validated
+- Book quantity ≥ 0
+- Prevent borrowing if no quantity available
+- Borrow limit: 3 books per student
+- Borrowing: reduce quantity by 1, set DueDate = 7 days
+- Returning: increase quantity by 1, mark status as `returned`
 
-student: Can borrow, return, and view books.
+---
 
-JWT tokens for secure authentication.
+## 📦 API Endpoints
 
-Middleware for role-based authorization.
+### Auth
+| Method | Endpoint | Role | Description |
+|--------|---------|------|-------------|
+| POST | `/api/auth/register` | Any | Register new user |
+| POST | `/api/auth/login` | Any | Login and receive JWT token |
 
-Entities
+### Users
+| Method | Endpoint | Role | Description |
+|--------|---------|------|-------------|
+| GET | `/api/users/me` | Any logged-in | Get current user details |
 
-Users
+### Books
+| Method | Endpoint | Role | Description |
+|--------|---------|------|-------------|
+| POST | `/api/books` | Librarian | Add a new book |
+| GET | `/api/books` | Any | List all books |
+| GET | `/api/books/{id}` | Any | Get book details |
+| PUT | `/api/books/{id}` | Librarian | Update book |
+| DELETE | `/api/books/{id}` | Librarian | Delete book |
 
-Id (PK)
+### Borrow
+| Method | Endpoint | Role | Description |
+|--------|---------|------|-------------|
+| POST | `/api/borrow/{bookId}` | Student | Borrow a book |
+| PUT | `/api/borrow/return/{id}` | Student | Return a book |
+| GET | `/api/borrow/my` | Student | View student's borrow history |
+| GET | `/api/borrow/all` | Librarian | View all borrow records |
 
-Name
+---
 
-Email (unique)
+## ⚙️ Technologies
+- ASP.NET Core 9
+- Entity Framework Core 8 (SQL Server)
+- JWT Authentication
+- BCrypt for password hashing
+- Swagger for API testing
 
-PasswordHash
+---
 
-Role (librarian or student)
 
-CreatedAt, UpdatedAt
+LibraryManagementSystem/
+├─ Controllers/
+│  ├─ AuthController.cs
+│  ├─ BooksController.cs
+│  ├─ BorrowController.cs
+│  └─ UsersController.cs
+├─ Models/
+│  ├─ User.cs
+│  ├─ Book.cs
+│  └─ BorrowRecord.cs
+├─ Data/
+│  └─ AppDbContext.cs
+├─ Services/
+│  └─ JwtTokenService.cs
+├─ DTOs/
+│  ├─ RegisterDto.cs
+│  ├─ LoginDto.cs
+│  └─ AuthResponseDto.cs
+├─ appsettings.json
+├─ Program.cs
+└─ README.md
 
-Books
+⚖️ License
 
-Id (PK)
+This project is under MIT License.
 
-Title, Author, ISBN (unique), Category
-
-Quantity (available copies)
-
-CreatedAt, UpdatedAt
-
-BorrowRecords
-
-Id (PK)
-
-UserId (FK → Users.Id)
-
-BookId (FK → Books.Id)
-
-BorrowDate, ReturnDate, DueDate
-
-Status (borrowed / returned)
-
-API Endpoints
-Auth
-
-POST /api/auth/register – Register a new user.
-
-POST /api/auth/login – Login and receive a JWT token.
-
-User
-
-GET /api/users/me – Get current user details.
-
-Books
-
-POST /api/books – Add a new book (Librarian only).
-
-GET /api/books – List all books (with optional search/filter/pagination).
-
-GET /api/books/{id} – Get book details.
-
-PUT /api/books/{id} – Update book details (Librarian only).
-
-DELETE /api/books/{id} – Delete a book (Librarian only).
-
-Borrow
-
-POST /api/borrow/{bookId} – Borrow a book (Student only).
-
-PUT /api/borrow/return/{id} – Return a book (Student only).
-
-GET /api/borrow/my – View student's borrow history.
-
-GET /api/borrow/all – View all borrow records (Librarian only).
-
-Validation & Logic
-
-Email format and password length validated during registration.
-
-Book quantity cannot be negative.
-
-Prevent borrowing if no quantity is available.
-
-Borrow limit: maximum 3 books per student.
-
-Borrowing:
-
-Checks availability (quantity > 0)
-
-Reduces book quantity by 1
-
-Sets DueDate to 7 days later
-
-Returning:
-
-Increases book quantity by 1
-
-Updates status to returned
-
-Technologies
-
-ASP.NET Core 9
-
-Entity Framework Core 8 (SQL Server)
-
-JWT Authentication
-
-BCrypt for password hashing
-
-Swagger for API testing
